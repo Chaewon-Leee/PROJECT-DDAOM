@@ -200,16 +200,18 @@ export default {
 <style scoped>
 /* < -- table --> */
 #bigbody {
-  width: 100%;
-  height: 100%;
-  margin: 0;
+  width: 100vw;
+  height: 100vh;
 }
-
+select {
+  margin-top: 50px;
+}
 section {
   margin: 0px;
-  width: calc(100% - 250px);
+  overflow-y: scroll;
+  min-width: calc(100% - 250px);
   height: calc(100% - 55px);
-  background-color: white;
+  background-color: antiquewhite;
   display: flex;
   position: relative;
   flex-direction: column;
