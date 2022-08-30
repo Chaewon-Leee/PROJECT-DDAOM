@@ -10,6 +10,7 @@
           </label>
         </div>
       </div>
+
       <ul :key="i" v-for="(project, i) in projectstatus.status">
         <li class="projectname">
           <div>
@@ -19,7 +20,7 @@
         <li class="projectlist">
           <div>
             <img
-              v-if="project.image_path === null"
+              v-if="project.image_path === null || project.image_path === ''"
               class="mainphoto"
               src="../assets/cat.jpg"
             />
@@ -31,7 +32,9 @@
               <button type="button" class="btnSubmit" @click="readOnlyTrue(i)">
                 &nbsp;완료&nbsp;
               </button>
-              <button type="button" class="btnSubmit">&nbsp;삭제&nbsp;</button>
+              <button type="button" class="btnSubmit" @click="fixedLink(i)">
+                &nbsp;삭제&nbsp;
+              </button>
             </span>
           </div>
           <div class="projectinf">
@@ -41,11 +44,20 @@
                 {{ peer.user_name }}
               </p>
             </div>
-            <p>일정: {{ project.start_date }} ~ {{ project.end_date }}</p>
+            <p>
+              일정: {{ dateFormat(project.start_date) }} ~
+              {{ dateFormat(project.end_date) }}
+            </p>
 
             <!-- 진행률 -->
             <div class="progress">
-              <div class="progress-bar" role="progressbar">
+              <div
+                class="progress-bar"
+                role="progressbar"
+                :style="{
+                  width: viewProgress(project.start_date, project.end_date)
+                }"
+              >
                 {{ viewProgress(project.start_date, project.end_date) }}
               </div>
             </div>
@@ -73,18 +85,24 @@
                   style="display: none"
                   v-if="project.id === link.project_id"
                 >
-                  >
                   <input type="text" :value="link.title" style="width: 50vw" />
                   <input type="text" :value="link.url" style="width: 50vw" />
                 </div>
               </span>
-              <!-- <div :key="v" v-for="(detail, v) in project.detailedProject">
-                <div class="detailedProject">
+
+              <div :key="i" v-for="(schedule, i) in proschedule.schedule">
+                <div
+                  v-if="project.id === schedule.project_id"
+                  class="detailedProject"
+                >
                   <v-icon small> mdi-check-bold </v-icon>&nbsp;
-                  {{ detail.name }}, &nbsp;{{ detail.Date[0] }} ~
-                  {{ detail.Date[1] }}, &nbsp;{{ detail.completed[0] }}
+                  {{ schedule.title }}, &nbsp;{{
+                    dateFormat(schedule.start_date)
+                  }}
+                  ~
+                  {{ dateFormat(schedule.end_date) }}
                 </div>
-              </div> -->
+              </div>
             </div>
             <button
               type="button"
@@ -126,18 +144,6 @@ export default {
     axios.get('/api/login').then((res) => {
       logininf.loginaccount = res.data
     })
-    const process = reactive({
-      // progress_width:
-      //   'width:' +
-      //   this.viewProgress(
-      //     this.project.projectList.start_date,
-      //     this.project.projectList.end_date
-      //   ),
-      // progress: this.viewProgress(
-      //   this.project.projectList.start_date,
-      //   this.project.projectList.end_date
-      // )
-    })
 
     const project = reactive({
       projectList: []
@@ -155,18 +161,25 @@ export default {
       Peer: []
     })
 
+    const proschedule = reactive({
+      schedule: []
+    })
+
     axios.get('/api/link').then((res) => {
-      // link : link table
       linklist.Link = res.data
     })
 
+    axios.get('/api/schedule').then((res) => {
+      proschedule.schedule = res.data
+    })
+
     axios.get('/api/peer').then((res) => {
-      // Peer : Project_User table
+      // console.log(res.data)
       peerlist.Peer = res.data
+      // console.log(peerlist.Peer)
     })
 
     axios.get('/api/list').then((res) => {
-      // projectList : project table
       project.projectList = res.data
       projectstatus.status = res.data
     })
@@ -184,14 +197,12 @@ export default {
           if (dateformat > today) {
             projectstatusValue.push(projectdata)
             projectstatus.status = projectstatusValue
-            console.log(projectstatus.status)
           }
         } else {
-          // 완료된거a
+          // 완료된거
           if (dateformat < today) {
             projectstatusValue.push(projectdata)
             projectstatus.status = projectstatusValue
-            console.log(projectstatus.status[0])
           }
         }
       }
@@ -204,45 +215,17 @@ export default {
       logininf,
       linklist,
       peerlist,
-      process,
       projectstatus,
-      toggle
+      toggle,
+      proschedule
     }
   },
   methods: {
-    togglea() {
-      this.projectstatus.status = []
-      const projectstatusValue = this.projectstatus.status
-      const togglebutton = document.getElementById('custom_input')
-      const today = new Date()
-      for (const i in this.project.projectList) {
-        const projectdata = this.project.projectList[i]
-        const dateformat = new Date(projectdata.end_date)
-        if (togglebutton.checked === false) {
-          // 진행중일때 ongoing
-          if (dateformat > today) {
-            projectstatusValue.push(projectdata)
-            this.projectstatus.status = projectstatusValue
-            console.log(this.projectstatus.status)
-          }
-        } else {
-          // 완료된거a
-          if (dateformat < today) {
-            projectstatusValue.push(projectdata)
-            this.projectstatus.status = projectstatusValue
-            console.log(this.projectstatus.status)
-          }
-        }
-      }
-
-      alert('complete')
-    },
     openClose(k) {
       // 부모의 이전형제의 두번째 자식
       const projectName = document.getElementById(
         this.project.projectList[k].name
       )
-      alert(this.project.projectList[k].name)
       const buttons =
         projectName.parentElement.previousElementSibling.childNodes[1]
       if (projectName.style.display === 'block') {
@@ -254,8 +237,10 @@ export default {
       }
     },
     readOnlyTrue(k) {
-      const project = this.project.projectList[k]
-      const link = document.getElementsByClassName(project.name)
+      // const project = this.project.projectList[k]
+      const link = document.getElementsByClassName(
+        this.project.projectList[k].name
+      )
       const projectName = document.getElementById(
         this.project.projectList[k].name
       )
@@ -264,9 +249,10 @@ export default {
       for (let i = 0; i < link.length; i++) {
         // link[i].childNodes[0].readonly = true
 
-        link[i].style.display = 'block'
-        link[i].previousElementSibling.style.display = 'none'
+        link[i].style.display = 'none'
+        link[i].previousElementSibling.style.display = 'block'
       }
+      this.fixedLink(k)
       this.fixedData(k)
     },
     readOnlyFalse(k) {
@@ -282,8 +268,8 @@ export default {
       projectName.childNodes[0].readOnly = false // 상세설명
 
       for (let i = 0; i < link.length; i++) {
-        link[i].style.display = 'none'
-        link[i].previousElementSibling.style.display = 'block'
+        link[i].style.display = 'block'
+        link[i].previousElementSibling.style.display = 'none'
       }
     },
     viewProgress(s, d) {
@@ -321,6 +307,43 @@ export default {
         this.project.projectList = res.data
       })
       alert('저장되었습니다.')
+    },
+    fixedLink(k) {
+      const link = document.getElementsByClassName(
+        this.project.projectList[k].name
+      )
+      let fixlink = []
+      let linkid = ''
+      for (let i = 0; i < link.length; i++) {
+        // 링크 개수만큼
+        const fixlinkname = link[i].childNodes[0].value
+        const fixlinkurl = link[i].childNodes[1].value
+        fixlink = [fixlinkname, fixlinkurl]
+        linkid = link[i].previousSibling.innerText
+        console.log(linkid)
+
+        axios.put('/api/fixlink/' + linkid, { fixlink }).then((res) => {
+          this.linklist.Link = res.data
+        })
+      }
+    },
+    dateFormat(date) {
+      const projectDate = new Date(date) // 해줘야 날짜형식으로 적용됨
+      const dateformat =
+        projectDate.getFullYear() +
+        '년 ' +
+        projectDate.getMonth() +
+        '월 ' +
+        projectDate.getDate() +
+        '일'
+      return dateformat
+    },
+    projectDelete(k) {
+      const projectid = this.project.projectList[k].id
+      // console.log(this.project.projectList[k].id)
+      if (confirm('삭제하시겠습니까?')) {
+        axios.delete('/api/list/delete/' + projectid).then((res) => {})
+      }
     }
   }
 }
