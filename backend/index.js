@@ -164,9 +164,9 @@ app.post("/api/password", async (req, res) => {
     const hintValue = query[i].hint
     const search = query[i].password
     if(req.body.content.hint === hintValue){
-       return res.send(search)
+      return res.send(search)
     } else{
-       return res.send('힌트 답변 틀림')
+      return res.send('힌트 답변 틀림')
     }
   }
 });

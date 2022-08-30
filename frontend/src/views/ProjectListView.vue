@@ -23,7 +23,7 @@
               class="mainphoto"
               src="../assets/cat.jpg"
             />
-            <img v-else class="mainphoto" :src="project.image_path" />
+            <img v-else class="mainphoto" :src="project.image_path.substring(4)" />
             <span style="display: none">
               <button type="button" class="btnSubmit" @click="readOnlyFalse(i)">
                 &nbsp;수정&nbsp;
