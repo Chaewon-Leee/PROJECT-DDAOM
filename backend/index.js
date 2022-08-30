@@ -205,6 +205,9 @@ app.post("/api/makeProject/project_user", async (req, res) => {
   await database.run(
     `INSERT INTO Project_User (user_id,project_id,user_name,checked,color) VALUES ('${req.body.content.user_id}',${req.body.content.id},'${req.body.content.user_name}',FALSE,'#000000')`
   );
+});
+
+app.post("/api/makeProject/project_user/personal", async (req, res) => {
   const name = await database.run(
     `SELECT name FROM User WHERE id = '${a}';`
   );
@@ -245,16 +248,10 @@ app.post("/api/makePlan/personal", async (req, res) => {
 
 // 프로젝트 리스트
 
-// app.get("/api/list", async (req, res) => {
-//   const id = req.body.content;
-//   console.log(id);
-// });
-
 app.get("/api/list", async (req, res) => {
   const result = await database.run(
     `SELECT * FROM Project WHERE id IN (SELECT project_id FROM Project_User WHERE user_id ='${a}')`
   );
-  // console.log(a);
 
   res.send(result);
 });

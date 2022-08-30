@@ -208,6 +208,10 @@ export default {
               .then((res) => {})
           }
 
+          axios
+            .post('/api/makeProject/project_user/personal', { content })
+            .then((res) => {})
+
           this.$router.push('/project')
         }
       }
