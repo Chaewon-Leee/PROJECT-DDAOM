@@ -115,7 +115,6 @@
             type="file"
             id="addFile"
             name="addFile"
-            multiple
             @change="onFileChange($event)" />
         </div>
         <div class="sectionDiv" id="saveOrCancleDiv">
@@ -221,25 +220,27 @@ export default {
           // 이미지 전송
           const imageformData = new FormData()
           const image = this.makeProjectinf.makeProject.image_path
-          imageformData.append('image file', image, image.name)
-
-          axios.post('/api/makeProject/imagefile', { content })
-
-          axios.post('/api/makeProject/imagefile/' + image.name, imageformData, { headers: { 'Content-Type': 'multipart/form-data' } })
-
+          imageformData.append('image', image, image.name)
+          axios.post('/api/makeProject/imagefile',
+            imageformData, { content },
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            }
+          ).then((res) => {})
           // 파일 전송
           const fileformData = new FormData()
-          const files = this.makeProjectinf.makeProject.file_path
-          for (let i = 0; i < files.length; i++) {
-            const file = files[i]
-            fileformData.append('files[' + i + ']', file, file.name)
-
-            axios.post('/api/makeProject/files', { content })
-              .then((res) => {})
-
-            axios.post('/api/makeProject/files/' + file.name, fileformData, { headers: { 'Content-Type': 'multipart/form-data' } })
-              .then((res) => {})
-          }
+          const file = this.makeProjectinf.makeProject.file_path
+          fileformData.append('files', file, file.name)
+          axios.post('/api/makeProject/file/',
+            fileformData, { content },
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            }
+          ).then((res) => {})
 
           this.$router.push('/project')
         }
@@ -402,7 +403,7 @@ export default {
       this.makeProjectinf.makeProject.image_path = event.target.files[0]
     },
     onFileChange(event) {
-      this.makeProjectinf.makeProject.file_path = event.target.files
+      this.makeProjectinf.makeProject.file_path = event.target.files[0]
     },
     cancleCheck() {
       if (confirm('취소하시겠습니까?')) {

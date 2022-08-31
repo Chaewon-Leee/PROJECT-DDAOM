@@ -1,6 +1,6 @@
 const express = require("express");
 const fileupload = require("express-fileupload");
-const path = require("path");
+const Axios = require('axios')
 const app = express();
 const port = 3000;
 const database = require("./database");
@@ -211,7 +211,7 @@ app.post("/api/makeProject/user", async (req, res) => {
 
 app.post("/api/makeProject/project_user", async (req, res) => {
   await database.run(
-    `INSERT INTO Project_User (user_id,project_id,user_name,checked,color) VALUES ('${req.body.content.user_id}',${req.body.content.id},'${req.body.content.user_name}',FALSE,'#000000')`
+    `INSERT INTO Project_User (user_id,project_id,user_name) VALUES ('${req.body.content.user_id}',${req.body.content.id},'${req.body.content.user_name}')`
   );
   const name = await database.run(
     `SELECT name FROM User WHERE id = '${a}';`
@@ -222,21 +222,15 @@ app.post("/api/makeProject/project_user", async (req, res) => {
 });
 
 app.post("/api/makeProject/imagefile", async (req, res) => {
-  const path = "/api/makeProject/imagefile/"
-  const image = req.body.content.image_path.name
   await database.run(
-  `INSERT INTO Project (image_path) VALUES ('${path + image}')`
+  `INSERT INTO Project (image_path) VALUES ('${req.body.imageformData}')`
   )
 })
 
-app.post("/api/makeProject/files", async (req, res) => {
-  const file = req.body.content.file_path
-  for (const i in file) {
-    const path = "/api/makeProject/files/"
-    await database.run(
-    `INSERT INTO Project (file_path) VALUES ('${path} + ${file[i].name}')`
-    )
-  }
+app.post("/api/makeProject/file", async (req, res) => {
+  await database.run(
+  `INSERT INTO Project (file_path) VALUES ('${req.dody.fileformData}')`
+  )
 })
 
 // 프로젝트 생성 끝
