@@ -3,7 +3,6 @@
     <Frame />
     <section>
       <div id="sectionBox">
-        <button @click="check()">123</button>
         <div class="sectionDiv" style="color: grey">
           * 표시된 항목은 필수 항목입니다. 반드시 입력해주세요.
         </div>
@@ -210,8 +209,8 @@ export default {
           const filename = this.makeProjectinf.makeProject.file_path.name
           fileformData.append('files', this.makeProjectinf.makeProject.file_path, this.makeProjectinf.makeProject.file_path.name)
 
-          axios.post('/api/makeProject/' + this.makeProjectinf.makeProject.image_path.name,
-            imageformData, { content },
+          axios.post('http://localhost:3000/makeProject/imagefile/' + content.id + '/' + this.makeProjectinf.makeProject.image_path.name,
+            imageformData,
             {
               headers: {
                 'Content-Type': 'multipart/form-data'
@@ -219,8 +218,8 @@ export default {
             }
           ).then((res) => {})
 
-          axios.post('/api/makeProject/' + this.makeProjectinf.makeProject.file_path.name,
-            fileformData, { content },
+          axios.post('http://localhost:3000/makeProject/file/' + content.id + '/' + this.makeProjectinf.makeProject.file_path.name,
+            fileformData,
             {
               headers: {
                 'Content-Type': 'multipart/form-data'
@@ -432,12 +431,6 @@ export default {
       for (let j = 0; j < linkname.length; j++) {
         this.makeProjectinf.makeProject.linkName[j] = linkname[j]
         this.makeProjectinf.makeProject.linkurl[j] = linkurl[j]
-      }
-    },
-    check() {
-      alert(this.makeProjectinf.makeProject.image_path.name)
-      for (let i = 0; i < this.makeProjectinf.makeProject.file_path.length; i++) {
-        alert(this.makeProjectinf.makeProject.file_path[i].name)
       }
     }
   }

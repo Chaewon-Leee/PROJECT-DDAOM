@@ -161,7 +161,7 @@ app.post("/api/makeProject", async (req, res) => {
   const filepath = 'http://localhost:3000/makeProject/file/'
 
   await database.run(
-    `INSERT INTO Project (id,name,start_date,end_date,description,image_path,file_path) VALUES ('${content.id}','${content.name}','${content.start_date}','${content.end_date}','${content.description}', '${imagepath + req.body.imagename}', '${filepath + req.body.filename}')`
+    `INSERT INTO Project (id,name,start_date,end_date,description,image_path,file_path) VALUES ('${content.id}','${content.name}','${content.start_date}','${content.end_date}','${content.description}', '${imagepath + content.id + '/' + req.body.imagename}', '${filepath + content.id + '/' + req.body.filename}')`
   );
 
   for(let j = 0; j < content.linkName.length; j++) {
