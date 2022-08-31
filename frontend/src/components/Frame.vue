@@ -1,6 +1,5 @@
 <template>
   <div id="body">
-    <MainPage @testValue="testFunction" />
     <header>
       <button @click="Isnone()" id="asideBarButton">
         <v-icon>mdi-menu</v-icon>
@@ -39,16 +38,14 @@
           <li>
             <!-- 개인 일정 필터 -->
             <div class="filterList">
-              <input type="checkbox" @change="changePersonalChecked()" />
+              <input
+                type="checkbox"
+                :id="state.Project_User[0].id"
+                @change="checkChange(-1)"
+              />
               {{ logininf.loginaccount.name }}
               <!-- 개인 일정 색상 = value값 & 현재의 username = id -->
-              <input
-                type="color"
-                :value="state.Project_User[0].color"
-                :id="state.Project_User[0].id"
-                class="color"
-                @change="changePersonalColor()"
-              />
+              <input type="color" class="color" @change="checkChange(-1)" />
             </div>
           </li>
           <li>
@@ -57,17 +54,14 @@
           <!-- 프로젝트 일정 필터 -->
           <li :key="i" v-for="(project, i) in state.Project">
             <div class="filterList">
-              <input type="checkbox" @change="changeChecked(i)" />{{
-                project.name
-              }}
-              <!-- 색상 = value값 & 현재의 project name = id -->
               <input
-                type="color"
-                :value="state.Project_User[i + 1].color"
+                type="checkbox"
                 :id="state.Project_User[i + 1].id"
-                class="color"
-                @change="changeColor(i)"
+                @change="checkChange(i)"
               />
+              {{ project.name }}
+              <!-- 색상 = value값 & 현재의 project name = id -->
+              <input type="color" class="color" @change="checkChange(i)" />
             </div>
           </li>
         </ul>
@@ -81,10 +75,9 @@
 <script>
 import axios from 'axios'
 import { reactive } from 'vue'
-import MainPage from '../views/MainView.vue'
 
 export default {
-  conponents: { MainPage },
+  conponents: {},
   data() {
     return {
       isnone: false
@@ -124,63 +117,14 @@ export default {
   created() {},
   mounted() {},
   methods: {
-    testFunction(testValue) {
-      console.log(testValue)
-    },
-    changeChecked(i) {
+    checkChange(i) {
       const checkValue = []
       checkValue[0] = this.state.Project_User[i + 1].id // 프로젝트
-      checkValue[1] = this.state.Project_User[i + 1].checked // 프로젝트의 변수 chedcked
-      alert(checkValue)
+      const a = document.getElementById(this.state.Project_User[i + 1].id)
+      checkValue[1] = a.checked // 프로젝트의 변수 chedcked
+      checkValue[2] = a.nextElementSibling.value
 
-      if (checkValue[1] === 0) {
-        // false인 경우
-        checkValue[1] = 1
-      } else if (checkValue[1] === 1) {
-        // true인 경우
-        checkValue[1] = 0
-      }
-
-      this.testFunction()
-
-      const content = checkValue
-      axios.post('/api/frame/update/checked', { content }).then((res) => {})
-    },
-    changePersonalChecked() {
-      const checkValue = []
-      checkValue[0] = this.state.Project_User[0].id
-      checkValue[1] = this.state.Project_User[0].checked
-      alert(checkValue)
-
-      if (checkValue[1] === 0) {
-        checkValue[1] = 1
-      } else if (checkValue[1] === 1) {
-        checkValue[1] = 0
-      }
-
-      const content = checkValue
-      axios.post('/api/frame/update/checked', { content }).then((res) => {})
-    },
-    changeColor(i) {
-      const colorValue = []
-      colorValue[0] = this.state.Project_User[i + 1].id
-      // i값을 이용해서 project i번째의 프로젝트 이름의 색상 값 가져옴
-      colorValue[1] = document.getElementById(
-        this.state.Project_User[i + 1].id
-      ).value
-
-      const content = colorValue
-      axios.post('/api/frame/update/color', { content }).then((res) => {}) // 데이터베이스에 전송
-    },
-    changePersonalColor() {
-      const colorValue = []
-      colorValue[0] = this.state.Project_User[0].id
-      colorValue[1] = document.getElementById(
-        this.state.Project_User[0].id
-      ).value // 유저네임으로 추출
-
-      const content = colorValue
-      axios.post('/api/frame/update/color', { content }).then((res) => {}) // 데이터베이스에 전송
+      this.$emit('checkValue', checkValue) // 전자의 이름으로 후자의 변수를 넘겨줌
     },
     Isnone() {
       this.isnone = !this.isnone
