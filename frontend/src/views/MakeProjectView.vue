@@ -3,6 +3,7 @@
     <Frame />
     <section>
       <div id="sectionBox">
+        <button @click="check()">123</button>
         <div class="sectionDiv" style="color: grey">
           * 표시된 항목은 필수 항목입니다. 반드시 입력해주세요.
         </div>
@@ -104,12 +105,19 @@
           <input
             type="file"
             id="addReoresehtativePicture"
-            @change="onImageChange"
+            name="addReoresehtativePicture"
+            @change="onImageChange($event)"
           />
+          <img src="" id="test" height="200">
         </div>
         <div class="sectionDiv" id="addFileDiv">
           <span class="sectionText">파일 첨부 :</span>
-          <input type="file" id="addFile" @change="onFileChange" />
+          <input
+            type="file"
+            id="addFile"
+            name="addFile"
+            multiple
+            @change="onFileChange($event)" />
         </div>
         <div class="sectionDiv" id="saveOrCancleDiv">
           <input
@@ -195,6 +203,7 @@ export default {
       } else {
         if (confirm('제출하시겠습니까?')) {
           this.randomNumber()
+          this.imagefileSummit()
 
           axios.post('/api/makeProject', { content }).then((res) => {})
 
@@ -371,17 +380,38 @@ export default {
           this.makeProjectinf.makeProject.start_date
       }
     },
-    onImageChange(e) {
-      const imageFile = e.target.files[0]
-      const url = URL.createObjectURL(imageFile)
-      this.makeProjectinf.makeProject.image_path = url
-      URL.revokeObjectURL(url)
+    onImageChange(event) {
+      this.makeProjectinf.makeProject.image_path = event.target.files[0]
     },
-    onFileChange(e) {
-      const File = e.target.files
-      const url = URL.createObjectURL(File[0])
-      this.makeProjectinf.makeProject.file_path = url
-      URL.revokeObjectURL(url)
+    onFileChange(event) {
+      this.makeProjectinf.makeProject.file_path = event.target.files
+    },
+    imagefileSummit() {
+      const formData = new FormData()
+      formData.append('image file', this.makeProjectinf.makeProject.image_path)
+
+      axios.post('/api/makeProject/imagefile', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    fileSummit() {
+      const formData = new FormData()
+      const files = this.makeProjectinf.makeProject.file_path
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        formData.append('files[' + i + ']', file)
+      }
+      axios.post('/api/makeProject/files' + files, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     cancleCheck() {
       if (confirm('취소하시겠습니까?')) {
@@ -409,6 +439,10 @@ export default {
         this.makeProjectinf.makeProject.linkName[j] = linkname[j]
         this.makeProjectinf.makeProject.linkurl[j] = linkurl[j]
       }
+    },
+    check() {
+      alert(this.makeProjectinf.makeProject.image_path)
+      alert(this.makeProjectinf.makeProject.file_path)
     }
   }
 }
