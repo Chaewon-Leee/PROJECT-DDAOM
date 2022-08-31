@@ -192,19 +192,14 @@ app.post("/api/makeProject/project_user", async (req, res) => {
   );
 });
 
-app.post("/api/makeProject/imagefile", async (req, res) => {
-  const path = '/api/makeProject/imagefile/'
+app.post("/api/makeProject/project_user/personal", async (req, res) => {
+  const name = await database.run(
+    `SELECT name FROM User WHERE id = '${a}';`
+  );
   await database.run(
-  `INSERT INTO Project (image_path) VALUES ('${path + req.body.imagename}')`
-  )
-})
-
-app.post("/api/makeProject/file", async (req, res) => {
-  const path = '/api/makeProject/file/'
-  await database.run(
-  `INSERT INTO Project (file_path) VALUES ('${path + req.body.filename}')`
-  )
-})
+    `INSERT INTO Project_User (user_id,project_id,user_name) VALUES ('${a}',${req.body.content.id},'${name[0].name}')`
+  );
+});
 
 // 프로젝트 생성 끝
 
