@@ -202,7 +202,33 @@ export default {
         if (confirm('제출하시겠습니까?')) {
           this.randomNumber()
 
-          axios.post('/api/makeProject', { content }).then((res) => {})
+          const imageformData = new FormData()
+          const imagename = this.makeProjectinf.makeProject.image_path.name
+          imageformData.append('image', this.makeProjectinf.makeProject.image_path, this.makeProjectinf.makeProject.image_path.name)
+
+          const fileformData = new FormData()
+          const filename = this.makeProjectinf.makeProject.file_path.name
+          fileformData.append('files', this.makeProjectinf.makeProject.file_path, this.makeProjectinf.makeProject.file_path.name)
+
+          axios.post('/api/makeProject' + this.makeProjectinf.makeProject.image_path.name,
+            imageformData, { content },
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            }
+          ).then((res) => {})
+
+          axios.post('/api/makeProject' + this.makeProjectinf.makeProject.file_path.name,
+            fileformData, { content },
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            }
+          ).then((res) => {})
+
+          axios.post('/api/makeProject', { content, imagename, filename }).then((res) => {})
           // 함꼐하는 사용자의 아이디와 이름 content로 추가
           for (const i in this.makeProjectinf.projectPeer.user_id) {
             content.user_id = this.makeProjectinf.projectPeer.user_id[i]
@@ -216,31 +242,6 @@ export default {
           axios
             .post('/api/makeProject/project_user/personal', { content })
             .then((res) => {})
-
-          // 이미지 전송
-          const imageformData = new FormData()
-          const image = this.makeProjectinf.makeProject.image_path
-          imageformData.append('image', image, image.name)
-          axios.post('/api/makeProject/imagefile',
-            imageformData, { content },
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            }
-          ).then((res) => {})
-          // 파일 전송
-          const fileformData = new FormData()
-          const file = this.makeProjectinf.makeProject.file_path
-          fileformData.append('files', file, file.name)
-          axios.post('/api/makeProject/file/',
-            fileformData, { content },
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            }
-          ).then((res) => {})
 
           this.$router.push('/project')
         }

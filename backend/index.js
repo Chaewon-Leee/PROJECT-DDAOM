@@ -157,9 +157,11 @@ app.post("/api/makeProject/id", async (req, res) => {
 
 app.post("/api/makeProject", async (req, res) => {
   const content = req.body.content
+  const imagepath = 'http://localhost:3000/makeProject/imagefile/'
+  const filepath = 'http://localhost:3000/makeProject/file/'
 
   await database.run(
-    `INSERT INTO Project (id,name,start_date,end_date,description) VALUES ('${content.id}','${content.name}','${content.start_date}','${content.end_date}','${content.description}')`
+    `INSERT INTO Project (id,name,start_date,end_date,description,image_path,file_path) VALUES ('${content.id}','${content.name}','${content.start_date}','${content.end_date}','${content.description}', '${imagepath + req.body.imagename}', '${filepath + req.body.filename}')`
   );
 
   for(let j = 0; j < content.linkName.length; j++) {
@@ -191,14 +193,16 @@ app.post("/api/makeProject/project_user", async (req, res) => {
 });
 
 app.post("/api/makeProject/imagefile", async (req, res) => {
+  const path = '/api/makeProject/imagefile/'
   await database.run(
-  `INSERT INTO Project (image_path) VALUES ('${req.body.imageformData}')`
+  `INSERT INTO Project (image_path) VALUES ('${path + req.body.imagename}')`
   )
 })
 
 app.post("/api/makeProject/file", async (req, res) => {
+  const path = '/api/makeProject/file/'
   await database.run(
-  `INSERT INTO Project (file_path) VALUES ('${req.dody.fileformData}')`
+  `INSERT INTO Project (file_path) VALUES ('${path + req.body.filename}')`
   )
 })
 
