@@ -210,7 +210,7 @@ export default {
           const filename = this.makeProjectinf.makeProject.file_path.name
           fileformData.append('files', this.makeProjectinf.makeProject.file_path, this.makeProjectinf.makeProject.file_path.name)
 
-          axios.post('/api/makeProject' + this.makeProjectinf.makeProject.image_path.name,
+          axios.post('/api/makeProject/' + this.makeProjectinf.makeProject.image_path.name,
             imageformData, { content },
             {
               headers: {
@@ -219,7 +219,7 @@ export default {
             }
           ).then((res) => {})
 
-          axios.post('/api/makeProject' + this.makeProjectinf.makeProject.file_path.name,
+          axios.post('/api/makeProject/' + this.makeProjectinf.makeProject.file_path.name,
             fileformData, { content },
             {
               headers: {
@@ -229,7 +229,8 @@ export default {
           ).then((res) => {})
 
           axios.post('/api/makeProject', { content, imagename, filename }).then((res) => {})
-          // 함꼐하는 사용자의 아이디와 이름 content로 추가
+
+          // 함께하는 사용자의 아이디와 이름 content로 추가
           for (const i in this.makeProjectinf.projectPeer.user_id) {
             content.user_id = this.makeProjectinf.projectPeer.user_id[i]
             content.user_name = this.makeProjectinf.projectPeer.user_name[i]
