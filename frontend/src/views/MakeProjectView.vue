@@ -108,7 +108,6 @@
             name="addReoresehtativePicture"
             @change="onImageChange($event)"
           />
-          <img src="" id="test" height="200">
         </div>
         <div class="sectionDiv" id="addFileDiv">
           <span class="sectionText">파일 첨부 :</span>
@@ -203,10 +202,8 @@ export default {
       } else {
         if (confirm('제출하시겠습니까?')) {
           this.randomNumber()
-          this.imagefileSummit()
 
           axios.post('/api/makeProject', { content }).then((res) => {})
-
           // 함꼐하는 사용자의 아이디와 이름 content로 추가
           for (const i in this.makeProjectinf.projectPeer.user_id) {
             content.user_id = this.makeProjectinf.projectPeer.user_id[i]
@@ -221,11 +218,33 @@ export default {
             .post('/api/makeProject/project_user/personal', { content })
             .then((res) => {})
 
+          // 이미지 전송
+          const imageformData = new FormData()
+          const image = this.makeProjectinf.makeProject.image_path
+          imageformData.append('image file', image, image.name)
+
+          axios.post('/api/makeProject/imagefile', { content })
+
+          axios.post('/api/makeProject/imagefile/' + image.name, imageformData, { headers: { 'Content-Type': 'multipart/form-data' } })
+
+          // 파일 전송
+          const fileformData = new FormData()
+          const files = this.makeProjectinf.makeProject.file_path
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i]
+            fileformData.append('files[' + i + ']', file, file.name)
+
+            axios.post('/api/makeProject/files', { content })
+              .then((res) => {})
+
+            axios.post('/api/makeProject/files/' + file.name, fileformData, { headers: { 'Content-Type': 'multipart/form-data' } })
+              .then((res) => {})
+          }
+
           this.$router.push('/project')
         }
       }
     },
-
     randomNumber() {
       const number = Math.random() * 1000000000
       let id = ''
@@ -255,7 +274,6 @@ export default {
       // id 값 부여
       this.makeProjectinf.makeProject.id = id
     },
-
     addMember() {
       const memberID = document.getElementById('addMembers').value
       const memberList = document.getElementById('memberList')
@@ -386,33 +404,6 @@ export default {
     onFileChange(event) {
       this.makeProjectinf.makeProject.file_path = event.target.files
     },
-    imagefileSummit() {
-      const formData = new FormData()
-      formData.append('image file', this.makeProjectinf.makeProject.image_path)
-
-      axios.post('/api/makeProject/imagefile', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
-        .then((res) => {
-          console.log(res)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    },
-    fileSummit() {
-      const formData = new FormData()
-      const files = this.makeProjectinf.makeProject.file_path
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i]
-        formData.append('files[' + i + ']', file)
-      }
-      axios.post('/api/makeProject/files' + files, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
-        .then((res) => {
-          console.log(res)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    },
     cancleCheck() {
       if (confirm('취소하시겠습니까?')) {
         this.$router.push('/project')
@@ -441,8 +432,10 @@ export default {
       }
     },
     check() {
-      alert(this.makeProjectinf.makeProject.image_path)
-      alert(this.makeProjectinf.makeProject.file_path)
+      alert(this.makeProjectinf.makeProject.image_path.name)
+      for (let i = 0; i < this.makeProjectinf.makeProject.file_path.length; i++) {
+        alert(this.makeProjectinf.makeProject.file_path[i].name)
+      }
     }
   }
 }

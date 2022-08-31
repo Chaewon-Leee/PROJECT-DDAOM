@@ -222,19 +222,21 @@ app.post("/api/makeProject/project_user", async (req, res) => {
 });
 
 app.post("/api/makeProject/imagefile", async (req, res) => {
-  const file = req.files.addReoresehtativePicture;
-  const path = "/api/makeProject/imagefile" + file;
+  const path = "/api/makeProject/imagefile/"
+  const image = req.body.content.image_path.name
   await database.run(
-  `INSERT INTO Project (image_path) VALUES ('${path}')`
+  `INSERT INTO Project (image_path) VALUES ('${path + image}')`
   )
 })
 
 app.post("/api/makeProject/files", async (req, res) => {
-  const file = req.files.addFile;
-  const path = "/api/makeProject/files" + file;
-  await database.run(
-  `INSERT INTO Project (file_path) VALUES ('${path}')`
-  )
+  const file = req.body.content.file_path
+  for (const i in file) {
+    const path = "/api/makeProject/files/"
+    await database.run(
+    `INSERT INTO Project (file_path) VALUES ('${path} + ${file[i].name}')`
+    )
+  }
 })
 
 // 프로젝트 생성 끝
