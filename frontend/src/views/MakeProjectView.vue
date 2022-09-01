@@ -209,7 +209,7 @@ export default {
           const filename = this.makeProjectinf.makeProject.file_path.name
           fileformData.append('files', this.makeProjectinf.makeProject.file_path, this.makeProjectinf.makeProject.file_path.name)
 
-          axios.post('http://localhost:3000/uploaded-image' + content.id + '/' + this.makeProjectinf.makeProject.image_path.name,
+          axios.post('http://localhost3000/uploaded-image',
             imageformData,
             {
               headers: {
