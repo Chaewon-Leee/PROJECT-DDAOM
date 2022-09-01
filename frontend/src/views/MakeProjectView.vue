@@ -216,7 +216,7 @@ export default {
                 'Content-Type': 'multipart/form-data'
               }
             }
-          ).then((res) => {})
+          ).then((res) => { console.log(res) })
 
           axios.post('http://localhost:3000/makeProject/file/' + content.id + '/' + this.makeProjectinf.makeProject.file_path.name,
             fileformData,
