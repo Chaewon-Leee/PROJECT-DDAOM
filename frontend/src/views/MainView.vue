@@ -225,7 +225,6 @@ export default {
       if (confirm('삭제하시겠습니까?')) {
         // 데이터베이스에 저장
         const removeValue = this.selectedEvent.id
-        alert(removeValue)
 
         const content = removeValue
         axios.post('/api/main/Schedule/remove', { content }).then((res) => {})
