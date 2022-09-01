@@ -203,19 +203,14 @@ export default {
 
           const imageformData = new FormData()
           const imagename = this.makeProjectinf.makeProject.image_path.name
-          imageformData.append('image', this.makeProjectinf.makeProject.image_path, this.makeProjectinf.makeProject.image_path.name)
+          imageformData.set('image', this.makeProjectinf.makeProject.image_path)
 
           const fileformData = new FormData()
           const filename = this.makeProjectinf.makeProject.file_path.name
-          fileformData.append('files', this.makeProjectinf.makeProject.file_path, this.makeProjectinf.makeProject.file_path.name)
+          fileformData.append('files', this.makeProjectinf.makeProject.file_path)
 
-          axios.post('http://localhost3000/uploaded-image',
-            imageformData,
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            }
+          axios.post('http://localhost:3000/makeProject/imagefile/' + content.id + '/' + this.makeProjectinf.makeProject.image_path.name,
+            imageformData
           ).then((res) => { console.log(res.data.url) })
 
           axios.post('/api/makeProject', { content, imagename, filename }).then((res) => {})
