@@ -13,7 +13,7 @@ app.use(cookieParser());
 
 app.post("/api/frame/color", async (req, res) => {
   const Project_User = await database.run(
-    `SELECT * FROM Project_User WHERE user_id = "${a}" ORDER BY project_id`
+    `SELECT * FROM Project_User WHERE user_id = "${a}"`
   );
   res.send(Project_User);
 });
@@ -21,7 +21,7 @@ app.post("/api/frame/color", async (req, res) => {
 app.post("/api/frame/project_name", async (req, res) => {
   const Project = await database.run(
     `SELECT * FROM Project WHERE id IN
-    (SELECT project_id FROM Project_User WHERE user_id ='${a}' ORDER BY project_id);`
+    (SELECT project_id FROM Project_User WHERE user_id ='${a}');`
   );
   res.send(Project);
 });
