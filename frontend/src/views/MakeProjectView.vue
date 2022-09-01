@@ -209,23 +209,14 @@ export default {
           const filename = this.makeProjectinf.makeProject.file_path.name
           fileformData.append('files', this.makeProjectinf.makeProject.file_path, this.makeProjectinf.makeProject.file_path.name)
 
-          axios.post('http://localhost:3000/makeProject/imagefile/' + content.id + '/' + this.makeProjectinf.makeProject.image_path.name,
+          axios.post('http://localhost:3000/uploaded-image' + content.id + '/' + this.makeProjectinf.makeProject.image_path.name,
             imageformData,
             {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
             }
-          ).then((res) => { console.log(res) })
-
-          axios.post('http://localhost:3000/makeProject/file/' + content.id + '/' + this.makeProjectinf.makeProject.file_path.name,
-            fileformData,
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            }
-          ).then((res) => {})
+          ).then((res) => { console.log(res.data.url) })
 
           axios.post('/api/makeProject', { content, imagename, filename }).then((res) => {})
 
