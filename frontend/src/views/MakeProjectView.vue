@@ -104,12 +104,17 @@
           <input
             type="file"
             id="addReoresehtativePicture"
-            @change="onImageChange"
+            name="addReoresehtativePicture"
+            @change="onImageChange($event)"
           />
         </div>
         <div class="sectionDiv" id="addFileDiv">
           <span class="sectionText">파일 첨부 :</span>
-          <input type="file" id="addFile" @change="onFileChange" />
+          <input
+            type="file"
+            id="addFile"
+            name="addFile"
+            @change="onFileChange($event)" />
         </div>
         <div class="sectionDiv" id="saveOrCancleDiv">
           <input
@@ -196,9 +201,21 @@ export default {
         if (confirm('제출하시겠습니까?')) {
           this.randomNumber()
 
-          axios.post('/api/makeProject', { content }).then((res) => {})
+          const imageformData = new FormData()
+          const imagename = this.makeProjectinf.makeProject.image_path.name
+          imageformData.set('image', this.makeProjectinf.makeProject.image_path)
 
-          // 함꼐하는 사용자의 아이디와 이름 content로 추가
+          const fileformData = new FormData()
+          const filename = this.makeProjectinf.makeProject.file_path.name
+          fileformData.append('files', this.makeProjectinf.makeProject.file_path)
+
+          axios.post('http://localhost:3000/makeProject/imagefile/' + content.id + '/' + this.makeProjectinf.makeProject.image_path.name,
+            imageformData
+          ).then((res) => { console.log(res.data.url) })
+
+          axios.post('/api/makeProject', { content, imagename, filename }).then((res) => {})
+
+          // 함께하는 사용자의 아이디와 이름 content로 추가
           for (const i in this.makeProjectinf.projectPeer.user_id) {
             content.user_id = this.makeProjectinf.projectPeer.user_id[i]
             content.user_name = this.makeProjectinf.projectPeer.user_name[i]
@@ -216,7 +233,6 @@ export default {
         }
       }
     },
-
     randomNumber() {
       const number = Math.random() * 1000000000
       let id = ''
@@ -246,7 +262,6 @@ export default {
       // id 값 부여
       this.makeProjectinf.makeProject.id = id
     },
-
     addMember() {
       const memberID = document.getElementById('addMembers').value
       const memberList = document.getElementById('memberList')
@@ -371,17 +386,11 @@ export default {
           this.makeProjectinf.makeProject.start_date
       }
     },
-    onImageChange(e) {
-      const imageFile = e.target.files[0]
-      const url = URL.createObjectURL(imageFile)
-      this.makeProjectinf.makeProject.image_path = url
-      URL.revokeObjectURL(url)
+    onImageChange(event) {
+      this.makeProjectinf.makeProject.image_path = event.target.files[0]
     },
-    onFileChange(e) {
-      const File = e.target.files
-      const url = URL.createObjectURL(File[0])
-      this.makeProjectinf.makeProject.file_path = url
-      URL.revokeObjectURL(url)
+    onFileChange(event) {
+      this.makeProjectinf.makeProject.file_path = event.target.files[0]
     },
     cancleCheck() {
       if (confirm('취소하시겠습니까?')) {

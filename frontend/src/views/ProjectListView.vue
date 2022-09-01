@@ -183,6 +183,10 @@ export default {
       projectstatus.status = res.data
     })
 
+    axios.get(project.image_path).then((res) => {
+      project.image_path = res.data.url
+    })
+
     const toggle = () => {
       projectstatus.status = []
       const projectstatusValue = projectstatus.status
