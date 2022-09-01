@@ -203,9 +203,7 @@ export default {
             content.user_id = this.makeProjectinf.projectPeer.user_id[i]
             content.user_name = this.makeProjectinf.projectPeer.user_name[i]
 
-            axios
-              .post('/api/makeProject/project_user', { content })
-              .then((res) => {})
+            axios.post('/api/project_user', { content }).then((res) => {})
           }
 
           axios

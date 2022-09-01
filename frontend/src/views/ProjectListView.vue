@@ -41,9 +41,9 @@
             <div id="peers">
               <p>함께하는 사람: &nbsp;&nbsp;</p>
               <span :key="t" v-for="(peer, t) in peerlist.Peer">
-                <p class="with" v-if="project.id === peer.project_id">
-                  {{ peer.user_name }}&nbsp;,&nbsp;&nbsp;
-                </p>
+                <i class="with" v-if="project.id === peer.project_id">
+                  {{ peer.user_name }}&nbsp;&nbsp;
+                </i>
               </span>
             </div>
             <p>
@@ -68,12 +68,13 @@
             <div :id="project.id" style="display: none">
               <textarea
                 class="with"
+                id="descarea"
                 :value="project.description"
                 readonly
-                style="resize: none; width: 50vw"
+                style="resize: none; width: 47vw"
                 rows="5"
               ></textarea>
-              관련 링크 :
+              <p>관련 링크 :</p>
               <span
                 :key="j"
                 v-for="(link, j) in linklist.Link"
@@ -109,7 +110,7 @@
             <button
               type="button"
               class="btn btn-secondary btn-sm"
-              style="float: right; margin-bottom: 30px"
+              style="float: right; margin-bottom: 30px; margin-right: 30px"
               @click="openClose(i)"
             >
               view more
@@ -297,13 +298,13 @@ export default {
       const fixedDesc = projectName.childNodes[0].value
       const fixed = [fixedProjectName, fixedDesc]
       axios.put('/api/fix/' + nameid, { fixed }).then((res) => {
-        this.project.projectList = res.data
+        this.projectstatus.status = res.data
       })
       alert('저장되었습니다.')
     },
     fixedLink(k) {
       const link = document.getElementsByClassName(
-        this.project.projectList[k].name
+        this.projectstatus.status[k].name
       )
       let fixlink = []
       let linkid = ''
@@ -392,6 +393,9 @@ section {
   overflow: hidden;
 }
 
+#descarea {
+  background-color: rgb(240, 240, 240);
+}
 #peers {
   display: flex;
 }

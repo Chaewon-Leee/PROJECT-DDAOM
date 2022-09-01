@@ -40,7 +40,6 @@ app.post("/api/signup", async (req, res) => {
 });
 
 app.post("/api/checkid", async (req, res) => {
-
   const query = await database.run(`SELECT id FROM User;`);
   let result = "사용가능";
   for (i in query) {
@@ -116,26 +115,33 @@ app.delete("/api/login", async (req, res) => {
 //비밀번호 시작
 
 app.post("/api/password", async (req, res) => {
-  const checkdata = await database.run(`SELECT name,id FROM User WHERE name='${req.body.content.name}' and id='${req.body.content.id}';`)
-  let result = '사용불가능'
-  for(i in checkdata){
-    const exist_name = checkdata[i].name
-    const exist_id = checkdata[i].id
-    if(req.body.content.name === exist_name & req.body.content.id === exist_id) {
-      result = '사용가능'
+  const checkdata = await database.run(
+    `SELECT name,id FROM User WHERE name='${req.body.content.name}' and id='${req.body.content.id}';`
+  );
+  let result = "사용불가능";
+  for (i in checkdata) {
+    const exist_name = checkdata[i].name;
+    const exist_id = checkdata[i].id;
+    if (
+      (req.body.content.name === exist_name) &
+      (req.body.content.id === exist_id)
+    ) {
+      result = "사용가능";
     }
   }
-  if(result === '사용불가능'){
-    return res.send('사용불가능')
+  if (result === "사용불가능") {
+    return res.send("사용불가능");
   }
-  const query = await database.run(`SELECT hint,password FROM User WHERE name = '${req.body.content.name}' and id = '${req.body.content.id}';`)
-  for(i in query){
-    const hintValue = query[i].hint
-    const search = query[i].password
-    if(req.body.content.hint === hintValue){
-       return res.send(search)
-    } else{
-       return res.send('힌트 답변 틀림')
+  const query = await database.run(
+    `SELECT hint,password FROM User WHERE name = '${req.body.content.name}' and id = '${req.body.content.id}';`
+  );
+  for (i in query) {
+    const hintValue = query[i].hint;
+    const search = query[i].password;
+    if (req.body.content.hint === hintValue) {
+      return res.send(search);
+    } else {
+      return res.send("힌트 답변 틀림");
     }
   }
 });
@@ -150,15 +156,15 @@ app.post("/api/makeProject/id", async (req, res) => {
 });
 
 app.post("/api/makeProject", async (req, res) => {
-  const content = req.body.content
+  const content = req.body.content;
 
   await database.run(
     `INSERT INTO Project (id,name,start_date,end_date,description,image_path,file_path) VALUES ('${content.id}','${content.name}','${content.start_date}','${content.end_date}','${content.description}','${content.image_path}','${content.file_path}')`
   );
 
-  for(let j = 0; j < content.linkName.length; j++) {
-    const url = content.linkurl[j]
-    const name = content.linkName[j]
+  for (let j = 0; j < content.linkName.length; j++) {
+    const url = content.linkurl[j];
+    const name = content.linkName[j];
     await database.run(
       `INSERT INTO Link (url,title,project_id) VALUES ('${url}','${name}','${content.id}')`
     );
@@ -170,16 +176,14 @@ app.post("/api/makeProject/user", async (req, res) => {
   res.send(user);
 });
 
-app.post("/api/makeProject/project_user", async (req, res) => {
+app.post("/api/project_user", async (req, res) => {
   await database.run(
     `INSERT INTO Project_User (user_id,project_id,user_name) VALUES ('${req.body.content.user_id}',${req.body.content.id},'${req.body.content.user_name}')`
   );
 });
 
 app.post("/api/makeProject/project_user/personal", async (req, res) => {
-  const name = await database.run(
-    `SELECT name FROM User WHERE id = '${a}';`
-  );
+  const name = await database.run(`SELECT name FROM User WHERE id = '${a}';`);
   await database.run(
     `INSERT INTO Project_User (user_id,project_id,user_name) VALUES ('${a}',${req.body.content.id},'${name[0].name}')`
   );
@@ -251,7 +255,6 @@ app.put("/api/fix/:nameid", async (req, res) => {
 });
 
 app.put("/api/fixlink/:linkid", async (req, res) => {
-  console.log(req.params.linkid);
   await database.run(
     `UPDATE Link SET title ='${req.body.fixlink[0]}',url ='${req.body.fixlink[1]}' WHERE title='${req.params.linkid}'`
   );

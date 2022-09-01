@@ -44,7 +44,9 @@
             <td>
               <p id="duplicate">ID중복 여부를 확인해주세요.</p>
             </td>
-            <button id="duplicate_button" @click="checkID()">&nbsp;ID 중복 검사&nbsp;</button>
+            <button id="duplicate_button" @click="checkID()">
+              &nbsp;ID 중복 검사&nbsp;
+            </button>
           </span>
         </tr>
         <tr>
