@@ -5,7 +5,14 @@
       <span id="logo">? Forgot your password</span>
       <div class="passwordContainer">
         <label for="userName"><b>이름</b></label>
-        <input type="text" id= "pw_name" placeholder="Enter Username" name="userName" required v-model="passwordinf.password.name" />
+        <input
+          type="text"
+          id="pw_name"
+          placeholder="Enter Username"
+          name="userName"
+          required
+          v-model="passwordinf.password.name"
+        />
         <label for="psw"><b>아이디</b></label>
         <input
           type="text"
@@ -16,6 +23,18 @@
           v-model="passwordinf.password.id"
         />
         <label for="psw"><b>비밀번호 힌트 답변</b></label>
+        <div>
+          <select id="question" size="1" class="select_hint">
+            <option value="">질문을 선택해주세요.</option>
+            <option
+              v-for="(item, index) in pwhintList"
+              :key="index"
+              :value="item.value"
+            >
+              {{ item.text }}
+            </option>
+          </select>
+        </div>
         <input
           type="text"
           id="pw_hint"
@@ -30,7 +49,9 @@
           </td>
           <td>
             <button id="backButton" @click="MoveBack()">
-              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrlVgUyXzl9ndi6xTSIQHZPsEB_N8E6w6fjg&usqp=CAU">
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrlVgUyXzl9ndi6xTSIQHZPsEB_N8E6w6fjg&usqp=CAU"
+              />
             </button>
           </td>
         </table>
@@ -47,7 +68,12 @@ export default {
   components: {},
   data() {
     return {
-      sampleData: ''
+      sampleData: '',
+      pwhintList: [
+        { text: ' 키우는 애완동물의 이름은? ', val: '0' },
+        { text: ' 가장 인상깊게 본 영화는? ', val: '1' },
+        { text: ' 기억에 남는 추억의 장소는? ', val: '2' }
+      ]
     }
   },
   setup() {
@@ -76,12 +102,7 @@ export default {
       const idPw = document.getElementById('pw_id').value
       const hintPw = document.getElementById('pw_hint').value
 
-      if (
-        (namePw === '') &
-        (idPw === '') &
-        (hintPw === '') ||
-        (namePw === '')
-      ) {
+      if ((namePw === '') & (idPw === '') & (hintPw === '') || namePw === '') {
         alert('이름을 입력해주세요.')
       } else if (idPw === '') {
         alert('아이디를 입력해주세요.')
@@ -119,6 +140,14 @@ body {
   justify-content: center;
 }
 
+#question {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid rgb(172, 171, 171);
+  box-sizing: border-box;
+}
 /* container */
 .totalContainer {
   position: absolute;
