@@ -101,11 +101,21 @@
         </div>
         <div class="sectionDiv" id="addReoresehtativePictureDiv">
           <span class="sectionText">대표사진 :</span>
-          <input
+          <!-- <input
             type="file"
             id="addReoresehtativePicture"
             @change="onImageChange"
-          />
+          /> -->
+          <button @click="onSave()">제출</button>
+          <form>
+            <input
+              type="file"
+              id="ex_file"
+              ref="uploadImageFile"
+              @change="onFileSelected"
+              accept="image/*"
+            />
+          </form>
         </div>
         <div class="sectionDiv" id="addFileDiv">
           <span class="sectionText">파일 첨부 :</span>
@@ -140,7 +150,9 @@ export default {
     Frame
   },
   data() {
-    return {}
+    return {
+      uploadImageFile: ''
+    }
   },
   setup() {
     const makeProjectinf = reactive({
@@ -176,6 +188,19 @@ export default {
     this.randomNumber()
   },
   methods: {
+    onFileSelected(event) {
+      this.uploadImageFile = this.$refs.uploadImageFile.files[0] // 3번
+    },
+
+    async onSave() {
+      const fd = new FormData() // 반드시 필요
+      fd.append('upLoadImage', this.uploadImageFile) // 4번
+      for (const key of fd.entries()) {
+        console.log(key[0] + ' ' + key[1])
+      }
+      await axios.post('/api/addimg', fd)
+    },
+
     saveCheck() {
       this.saveLink()
 
@@ -196,7 +221,7 @@ export default {
         if (confirm('제출하시겠습니까?')) {
           this.randomNumber()
 
-          axios.post('/api/makeProject', { content }).then((res) => {})
+          axios.post('/api/addproject', { content }).then((res) => {})
 
           // 함꼐하는 사용자의 아이디와 이름 content로 추가
           for (const i in this.makeProjectinf.projectPeer.user_id) {
@@ -209,7 +234,7 @@ export default {
           axios
             .post('/api/makeProject/project_user/personal', { content })
             .then((res) => {})
-
+          this.onSave()
           this.$router.push('/project')
         }
       }
