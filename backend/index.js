@@ -1,4 +1,6 @@
 const express = require("express");
+const fileupload = require("express-fileupload");
+const Axios = require("axios");
 const app = express();
 const port = 3000;
 const database = require("./database");
@@ -8,6 +10,8 @@ const jwt = require("jsonwebtoken");
 global.a = "";
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(fileupload());
+app.use(express.urlencoded({ extended: true }));
 
 // 프레임 시작
 
@@ -157,9 +161,17 @@ app.post("/api/makeProject/id", async (req, res) => {
 
 app.post("/api/makeProject", async (req, res) => {
   const content = req.body.content;
+  const imagepath = "http://localhost:3000/makeProject/imagefile/";
+  // const filepath = "http://localhost:3000/makeProject/file/";
 
   await database.run(
-    `INSERT INTO Project (id,name,start_date,end_date,description,image_path,file_path) VALUES ('${content.id}','${content.name}','${content.start_date}','${content.end_date}','${content.description}','${content.image_path}','${content.file_path}')`
+    `INSERT INTO Project (id,name,start_date,end_date,description,image_path,file_path) VALUES ('${
+      content.id
+    }','${content.name}','${content.start_date}','${content.end_date}','${
+      content.description
+    }', '${imagepath + content.id + "/" + req.body.imagename}', '${
+      filepath + content.id + "/" + req.body.filename
+    }')`
   );
 
   for (let j = 0; j < content.linkName.length; j++) {
@@ -176,9 +188,13 @@ app.post("/api/makeProject/user", async (req, res) => {
   res.send(user);
 });
 
-app.post("/api/project_user", async (req, res) => {
+app.post("/api/makeProject/project_user", async (req, res) => {
   await database.run(
     `INSERT INTO Project_User (user_id,project_id,user_name) VALUES ('${req.body.content.user_id}',${req.body.content.id},'${req.body.content.user_name}')`
+  );
+  const name = await database.run(`SELECT name FROM User WHERE id = '${a}';`);
+  await database.run(
+    `INSERT INTO Project_User (user_id,project_id,user_name) VALUES ('${a}',${req.body.content.id},'${name[0].name}')`
   );
 });
 
@@ -221,10 +237,16 @@ app.post("/api/makePlan/personal", async (req, res) => {
 
 // 프로젝트 리스트
 
+// app.get("/api/list", async (req, res) => {
+//   const id = req.body.content;
+//   console.log(id);
+// });
+
 app.get("/api/list", async (req, res) => {
   const result = await database.run(
     `SELECT * FROM Project WHERE id IN (SELECT project_id FROM Project_User WHERE user_id ='${a}')`
   );
+  // console.log(a);
 
   res.send(result);
 });
@@ -245,37 +267,21 @@ app.get("/api/peer", async (req, res) => {
 });
 
 app.put("/api/fix/:nameid", async (req, res) => {
+  console.log(req.body.fixed);
   await database.run(
-    `UPDATE Project SET name ='${req.body.fixed[0]}', description ='${req.body.fixed[1]}' WHERE id=${req.params.nameid}`
-  );
-  const result = await database.run(
-    `SELECT * FROM Project WHERE id IN (SELECT project_id FROM Project_User WHERE user_id = '${a}')`
-  );
-  res.send(result);
-});
-
-app.put("/api/fixlink/:linkid", async (req, res) => {
-  await database.run(
-    `UPDATE Link SET title ='${req.body.fixlink[0]}',url ='${req.body.fixlink[1]}' WHERE title='${req.params.linkid}'`
+    `UPDATE Project SET name ='${req.body.fixed[0]}',description ='${req.body.fixed[1]}' WHERE id=${req.params.nameid}`
   );
   const result = await database.run(
     `SELECT * FROM Link WHERE project_id IN (SELECT project_id FROM Project_User WHERE user_id = '${a}')`
   );
   res.send(result);
 });
-
 app.get("/api/schedule", async (req, res) => {
   // 프로젝트 일정 가져오기
   const result = await database.run(
     `SELECT * FROM Schedule WHERE user_id = '${a}'`
   );
   res.send(result);
-});
-
-app.delete("/api/list/delete/:projectid", async (req, res) => {
-  await database.run(
-    `DELETE FROM Project WHERE id = '${req.params.projectid}'`
-  );
 });
 
 // 프로젝트 리스트 끝
