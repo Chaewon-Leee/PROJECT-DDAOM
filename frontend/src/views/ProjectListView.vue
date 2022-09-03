@@ -224,7 +224,6 @@ export default {
       const projectName = document.getElementById(
         this.projectstatus.status[k].id
       )
-      console.log(this.projectstatus.status[k].id)
       const buttons =
         projectName.parentElement.previousElementSibling.childNodes[1]
       if (projectName.style.display === 'block') {
