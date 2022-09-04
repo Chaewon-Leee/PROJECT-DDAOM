@@ -10,7 +10,7 @@
           </label>
         </div>
       </div>
-
+      <img class="mainphoto" :src="proimg.img" />
       <ul :key="i" v-for="(project, i) in projectstatus.status" id="ulborder">
         <li class="projectname" style="margin-top: 20px">
           <div>
@@ -147,6 +147,11 @@ export default {
       logininf.loginaccount = res.data
     })
 
+    axios.get('/api/sendimg').then((res) => {
+      console.log(res.data)
+      proimg.img = res.data
+    })
+
     const project = reactive({
       projectList: []
     })
@@ -165,6 +170,10 @@ export default {
 
     const proschedule = reactive({
       schedule: []
+    })
+
+    const proimg = reactive({
+      img: []
     })
 
     axios.get('/api/link').then((res) => {
@@ -215,7 +224,8 @@ export default {
       peerlist,
       projectstatus,
       toggle,
-      proschedule
+      proschedule,
+      proimg
     }
   },
   methods: {
@@ -224,7 +234,6 @@ export default {
       const projectName = document.getElementById(
         this.projectstatus.status[k].id
       )
-      console.log(this.projectstatus.status[k].id)
       const buttons =
         projectName.parentElement.previousElementSibling.childNodes[1]
       if (projectName.style.display === 'block') {

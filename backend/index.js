@@ -6,8 +6,10 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 global.a = "";
+global.img = "";
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use("/images", express.static("images"));
 
 // 프레임 시작
 
@@ -149,13 +151,35 @@ app.post("/api/password", async (req, res) => {
 //비밀번호 끝
 
 // 프로젝트 생성 시작
+// 이미지
 
-app.post("/api/makeProject/id", async (req, res) => {
-  const project = await database.run(`SELECT id FROM Project`);
-  res.send(project);
+const multer = require("multer");
+const imageSavePath = "images/";
+
+const storage = multer.diskStorage({
+  //파일저장경로
+  destination(req, file, callback) {
+    callback(null, imageSavePath);
+  },
+});
+const upload = multer({ storage: storage });
+app.post(
+  // 프론트앤드에서 추가한 이미지를 백앤드에서 받음
+  "/api/addimg",
+  upload.single("upLoadImage"),
+  async (req, res, next) => {
+    global.img = req.file;
+  }
+);
+
+app.get("/api/sendimg", async (req, res) => {
+  //백앤드에서 받은 이미지를 프로젝트 리스트로 전달
+  const imgUrl = "http://localhost:3000/images/";
+  result = imgUrl + img.filename;
+  res.send(result);
 });
 
-app.post("/api/makeProject", async (req, res) => {
+app.post("/api/addproject/", async (req, res) => {
   const content = req.body.content;
 
   await database.run(
@@ -169,6 +193,11 @@ app.post("/api/makeProject", async (req, res) => {
       `INSERT INTO Link (url,title,project_id) VALUES ('${url}','${name}','${content.id}')`
     );
   }
+});
+
+app.post("/api/makeProject/id", async (req, res) => {
+  const project = await database.run(`SELECT id FROM Project`);
+  res.send(project);
 });
 
 app.post("/api/makeProject/user", async (req, res) => {
@@ -225,7 +254,6 @@ app.get("/api/list", async (req, res) => {
   const result = await database.run(
     `SELECT * FROM Project WHERE id IN (SELECT project_id FROM Project_User WHERE user_id ='${a}')`
   );
-
   res.send(result);
 });
 
