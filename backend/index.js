@@ -1,4 +1,6 @@
 const express = require("express");
+const fileupload = require("express-fileupload");
+const Axios = require('axios')
 const app = express();
 const port = 3000;
 const database = require("./database");
@@ -45,12 +47,12 @@ app.post("/api/checkid", async (req, res) => {
   const query = await database.run(`SELECT id FROM User;`);
   let result = "사용가능";
   for (i in query) {
-    const exist = query[i].id;
+    const exist = query[i].id
     if (req.body.content === exist) {
-      result = "사용불가능";
+      result = '사용불가능'
     }
   }
-  res.send(result);
+  res.send(result)
 });
 
 // 회원가입 끝
@@ -183,7 +185,7 @@ app.post("/api/addproject/", async (req, res) => {
   const content = req.body.content;
 
   await database.run(
-    `INSERT INTO Project (id,name,start_date,end_date,description,image_path,file_path) VALUES ('${content.id}','${content.name}','${content.start_date}','${content.end_date}','${content.description}','${content.image_path}','${content.file_path}')`
+    `INSERT INTO Project (id,name,start_date,end_date,description,image_path,file_path) VALUES ('${content.id}','${content.name}','${content.start_date}','${content.end_date}','${content.description}', '${imagepath + content.id + '/' + req.body.imagename}', '${filepath + content.id + '/' + req.body.filename}')`
   );
 
   for (let j = 0; j < content.linkName.length; j++) {
@@ -201,13 +203,21 @@ app.post("/api/makeProject/id", async (req, res) => {
 });
 
 app.post("/api/makeProject/user", async (req, res) => {
-  const user = await database.run(`SELECT id, name FROM User`);
+  const user = await database.run(
+    `SELECT id, name FROM User`
+  );
   res.send(user);
 });
 
 app.post("/api/project_user", async (req, res) => {
   await database.run(
     `INSERT INTO Project_User (user_id,project_id,user_name) VALUES ('${req.body.content.user_id}',${req.body.content.id},'${req.body.content.user_name}')`
+  );
+  const name = await database.run(
+    `SELECT name FROM User WHERE id = '${a}';`
+  );
+  await database.run(
+    `INSERT INTO Project_User (user_id,project_id,user_name) VALUES ('${a}',${req.body.content.id},'${name[0].name}')`
   );
 });
 
@@ -223,6 +233,7 @@ app.post("/api/makeProject/project_user/personal", async (req, res) => {
 // 일정 생성 시작
 
 app.post("/api/makePlan/project", async (req, res) => {
+
   const Project = await database.run(
     `SELECT * FROM Project WHERE id IN (
       SELECT project_id FROM Project_User WHERE user_id = '${a}');`
@@ -231,7 +242,7 @@ app.post("/api/makePlan/project", async (req, res) => {
 });
 
 app.post("/api/makePlan/together", async (req, res) => {
-  const scheduleValue = req.body.content;
+  const scheduleValue = req.body.content
 
   await database.run(
     `INSERT INTO Schedule (user_id, project_id, title,start_date,end_date,description) VALUES ('${a}', '${scheduleValue.projectId}','${scheduleValue.title}','${scheduleValue.start_date}','${scheduleValue.end_date}','${scheduleValue.description}')`
@@ -239,7 +250,7 @@ app.post("/api/makePlan/together", async (req, res) => {
 });
 
 app.post("/api/makePlan/personal", async (req, res) => {
-  const scheduleValue = req.body.content;
+  const scheduleValue = req.body.content
 
   await database.run(
     `INSERT INTO Schedule (user_id, title,start_date,end_date,description) VALUES ('${a}','${scheduleValue.title}','${scheduleValue.start_date}','${scheduleValue.end_date}','${scheduleValue.description}')`
@@ -249,6 +260,11 @@ app.post("/api/makePlan/personal", async (req, res) => {
 // 일정 생성 끝
 
 // 프로젝트 리스트
+
+// app.get("/api/list", async (req, res) => {
+//   const id = req.body.content;
+//   console.log(id);
+// });
 
 app.get("/api/list", async (req, res) => {
   const result = await database.run(
@@ -273,6 +289,7 @@ app.get("/api/peer", async (req, res) => {
 });
 
 app.put("/api/fix/:nameid", async (req, res) => {
+  console.log(req.body.fixed);
   await database.run(
     `UPDATE Project SET name ='${req.body.fixed[0]}', description ='${req.body.fixed[1]}' WHERE id=${req.params.nameid}`
   );
@@ -290,20 +307,6 @@ app.put("/api/fixlink/:linkid", async (req, res) => {
     `SELECT * FROM Link WHERE project_id IN (SELECT project_id FROM Project_User WHERE user_id = '${a}')`
   );
   res.send(result);
-});
-
-app.get("/api/schedule", async (req, res) => {
-  // 프로젝트 일정 가져오기
-  const result = await database.run(
-    `SELECT * FROM Schedule WHERE user_id = '${a}'`
-  );
-  res.send(result);
-});
-
-app.delete("/api/list/delete/:projectid", async (req, res) => {
-  await database.run(
-    `DELETE FROM Project WHERE id = '${req.params.projectid}'`
-  );
 });
 
 // 프로젝트 리스트 끝
