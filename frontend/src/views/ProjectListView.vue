@@ -10,7 +10,7 @@
           </label>
         </div>
       </div>
-
+      <img class="mainphoto" :src="proimg.img" />
       <ul :key="i" v-for="(project, i) in projectstatus.status" id="ulborder">
         <li class="projectname" style="margin-top: 20px">
           <div>
@@ -41,9 +41,9 @@
             <div id="peers">
               <p>함께하는 사람: &nbsp;&nbsp;</p>
               <span :key="t" v-for="(peer, t) in peerlist.Peer">
-                <p class="with" v-if="project.id === peer.project_id">
-                  {{ peer.user_name }}&nbsp;,&nbsp;&nbsp;
-                </p>
+                <i class="with" v-if="project.id === peer.project_id">
+                  {{ peer.user_name }}&nbsp;&nbsp;
+                </i>
               </span>
             </div>
             <p>
@@ -68,12 +68,13 @@
             <div :id="project.id" style="display: none">
               <textarea
                 class="with"
+                id="descarea"
                 :value="project.description"
                 readonly
-                style="resize: none; width: 50vw"
+                style="resize: none; width: 47vw"
                 rows="5"
               ></textarea>
-              관련 링크 :
+              <p>관련 링크 :</p>
               <span
                 :key="j"
                 v-for="(link, j) in linklist.Link"
@@ -109,7 +110,7 @@
             <button
               type="button"
               class="btn btn-secondary btn-sm"
-              style="float: right; margin-bottom: 30px"
+              style="float: right; margin-bottom: 30px; margin-right: 30px"
               @click="openClose(i)"
             >
               view more
@@ -146,6 +147,11 @@ export default {
       logininf.loginaccount = res.data
     })
 
+    axios.get('/api/sendimg').then((res) => {
+      console.log(res.data)
+      proimg.img = res.data
+    })
+
     const project = reactive({
       projectList: []
     })
@@ -164,6 +170,10 @@ export default {
 
     const proschedule = reactive({
       schedule: []
+    })
+
+    const proimg = reactive({
+      img: []
     })
 
     axios.get('/api/link').then((res) => {
@@ -218,7 +228,8 @@ export default {
       peerlist,
       projectstatus,
       toggle,
-      proschedule
+      proschedule,
+      proimg
     }
   },
   methods: {
@@ -227,7 +238,6 @@ export default {
       const projectName = document.getElementById(
         this.projectstatus.status[k].id
       )
-      console.log(this.projectstatus.status[k].id)
       const buttons =
         projectName.parentElement.previousElementSibling.childNodes[1]
       if (projectName.style.display === 'block') {
@@ -301,13 +311,13 @@ export default {
       const fixedDesc = projectName.childNodes[0].value
       const fixed = [fixedProjectName, fixedDesc]
       axios.put('/api/fix/' + nameid, { fixed }).then((res) => {
-        this.project.projectList = res.data
+        this.projectstatus.status = res.data
       })
       alert('저장되었습니다.')
     },
     fixedLink(k) {
       const link = document.getElementsByClassName(
-        this.project.projectList[k].name
+        this.projectstatus.status[k].name
       )
       let fixlink = []
       let linkid = ''
@@ -396,6 +406,9 @@ section {
   overflow: hidden;
 }
 
+#descarea {
+  background-color: rgb(240, 240, 240);
+}
 #peers {
   display: flex;
 }

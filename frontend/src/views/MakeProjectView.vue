@@ -101,12 +101,21 @@
         </div>
         <div class="sectionDiv" id="addReoresehtativePictureDiv">
           <span class="sectionText">대표사진 :</span>
-          <input
+          <!-- <input
             type="file"
             id="addReoresehtativePicture"
-            name="addReoresehtativePicture"
-            @change="onImageChange($event)"
-          />
+            @change="onImageChange"
+          /> -->
+          <button @click="onSave()">제출</button>
+          <form>
+            <input
+              type="file"
+              id="ex_file"
+              ref="uploadImageFile"
+              @change="onFileSelected"
+              accept="image/*"
+            />
+          </form>
         </div>
         <div class="sectionDiv" id="addFileDiv">
           <span class="sectionText">파일 첨부 :</span>
@@ -145,7 +154,9 @@ export default {
     Frame
   },
   data() {
-    return {}
+    return {
+      uploadImageFile: ''
+    }
   },
   setup() {
     const makeProjectinf = reactive({
@@ -181,6 +192,19 @@ export default {
     this.randomNumber()
   },
   methods: {
+    onFileSelected(event) {
+      this.uploadImageFile = this.$refs.uploadImageFile.files[0] // 3번
+    },
+
+    async onSave() {
+      const fd = new FormData() // 반드시 필요
+      fd.append('upLoadImage', this.uploadImageFile) // 4번
+      for (const key of fd.entries()) {
+        console.log(key[0] + ' ' + key[1])
+      }
+      await axios.post('/api/addimg', fd)
+    },
+
     saveCheck() {
       this.saveLink()
 
@@ -201,17 +225,8 @@ export default {
         if (confirm('제출하시겠습니까?')) {
           this.randomNumber()
 
-          const imageformData = new FormData()
-          const imagename = this.makeProjectinf.makeProject.image_path.name
-          imageformData.set('image', this.makeProjectinf.makeProject.image_path)
 
-          const fileformData = new FormData()
-          const filename = this.makeProjectinf.makeProject.file_path.name
-          fileformData.append('files', this.makeProjectinf.makeProject.file_path)
-
-          axios.post('http://localhost:3000/makeProject/imagefile/' + content.id + '/' + this.makeProjectinf.makeProject.image_path.name,
-            imageformData
-          ).then((res) => { console.log(res.data.url) })
+          axios.post('/api/addproject', { content }).then((res) => {})
 
           axios.post('/api/makeProject', { content, imagename, filename }).then((res) => {})
 
@@ -220,15 +235,13 @@ export default {
             content.user_id = this.makeProjectinf.projectPeer.user_id[i]
             content.user_name = this.makeProjectinf.projectPeer.user_name[i]
 
-            axios
-              .post('/api/makeProject/project_user', { content })
-              .then((res) => {})
+            axios.post('/api/project_user', { content }).then((res) => {})
           }
 
           axios
             .post('/api/makeProject/project_user/personal', { content })
             .then((res) => {})
-
+          this.onSave()
           this.$router.push('/project')
         }
       }
