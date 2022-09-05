@@ -5,11 +5,15 @@ const database = require("./database");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+
 global.a = "";
 global.img = "";
+global.file = "";
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use("/images", express.static("images"));
+app.use("/files", express.static("files"));
 
 // 프레임 시작
 
@@ -151,9 +155,8 @@ app.post("/api/password", async (req, res) => {
 //비밀번호 끝
 
 // 프로젝트 생성 시작
-// 이미지
 
-const multer = require("multer");
+// 이미지
 const imageSavePath = "images/";
 
 const storage = multer.diskStorage({
@@ -162,28 +165,19 @@ const storage = multer.diskStorage({
     callback(null, imageSavePath);
   },
 });
+
 const upload = multer({ storage: storage });
 
 app.post(
   // 프론트앤드에서 추가한 이미지를 백앤드에서 받음
-  "/api/addimg",
+  "/api/addimgImage",
   upload.single("upLoadImage"),
   async (req, res, next) => {
     global.img = req.file;
-    console.log('첫번째');
   }
 );
 
-app.get("/api/sendimg", async (req, res) => {
-  //백앤드에서 받은 이미지를 프로젝트 리스트로 전달
-  const imgUrl = "http://localhost:3000/images/";
-  result = imgUrl + img.filename;
-  res.send(result);
-});
-
 app.get("/api/getimage", async (req, res) => {
-  console.log('두번째');
-
   const imgUrl = "http://localhost:3000/images/";
   result = imgUrl + img.filename;
   res.send(result);
@@ -192,7 +186,7 @@ app.get("/api/getimage", async (req, res) => {
 app.post("/api/addproject", async (req, res) => {
   console.log('마지막')
   const content = req.body.content;
-  console.log(content.image_path)
+  console.log(content.file_path)
 
   await database.run(
     `INSERT INTO Project (id,name,start_date,end_date,description,image_path,file_path) VALUES ('${content.id}','${content.name}','${content.start_date}','${content.end_date}','${content.description}','${content.image_path}','${content.file_path}')`
@@ -206,6 +200,40 @@ app.post("/api/addproject", async (req, res) => {
     );
   }
 });
+
+// 이미지 끝
+
+// 파일
+
+const fileSavePath = "files/";
+
+const fileStorage = multer.diskStorage({
+  //파일저장경로
+  destination(req, file, callback) {
+    callback(null, fileSavePath);
+  },
+});
+
+const fileUpload = multer({ storage: fileStorage });
+
+
+app.post(
+  "/api/addimgFile",
+  fileUpload.single("uploadFile"),
+  async (req, res, next) => {
+    global.file = req.file;
+    console.log('첫번째    ' + file);
+  }
+);
+
+app.get("/api/getfile", async (req, res) => {
+  console.log('두번째     ' + file);
+  const fileUrl = "http://localhost:3000/files/";
+  result = fileUrl + file.filename;
+  res.send(result);
+});
+
+// 파일 끝
 
 app.post("/api/makeProject/id", async (req, res) => {
   const project = await database.run(`SELECT id FROM Project`);
