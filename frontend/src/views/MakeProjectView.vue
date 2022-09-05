@@ -113,7 +113,14 @@
         </div>
         <div class="sectionDiv" id="addFileDiv">
           <span class="sectionText">파일 첨부 :</span>
-          <input type="file" id="addFile" @change="onFileChange" />
+          <form>
+            <input
+              type="file"
+              id="addFile"
+              ref="uploadFileFile"
+              @change="onFileChange"
+            />
+          </form>
         </div>
         <div class="sectionDiv" id="saveOrCancleDiv">
           <input
@@ -145,7 +152,8 @@ export default {
   },
   data() {
     return {
-      uploadImageFile: ''
+      uploadImageFile: '',
+      uploadFileFile: ''
     }
   },
   setup() {
@@ -186,18 +194,49 @@ export default {
       this.uploadImageFile = this.$refs.uploadImageFile.files[0]
     },
 
-    async onSave() {
+    onFileChange(event) {
+      this.uploadFileFile = this.$refs.uploadFileFile.files[0]
+    },
+
+    async uploadImage() {
       const fd = new FormData()
       fd.append('upLoadImage', this.uploadImageFile)
-      await axios.post('/api/addimg', fd)
+      await axios.post('/api/addimgImage', fd)
+    },
+
+    async uploadFile() {
+      const form = new FormData()
+      form.append('uploadFile', this.uploadFileFile)
+      await axios.post('/api/addimgFile', form)
     },
 
     async getImage() {
       await axios.get('/api/getimage').then((res) => {
         this.makeProjectinf.makeProject.image_path = res.data
-        alert('xptmxm' + res.data)
-        alert('확인' + this.makeProjectinf.makeProject.image_path)
       })
+    },
+
+    async getFile() {
+      await axios.get('/api/getfile').then((res) => {
+        this.makeProjectinf.makeProject.file_path = res.data
+      })
+    },
+
+    makeProject() {
+      const content = this.makeProjectinf.makeProject
+      axios.post('/api/addproject', { content }).then((res) => {})
+
+      // 함꼐하는 사용자의 아이디와 이름 content로 추가
+      for (const i in this.makeProjectinf.projectPeer.user_id) {
+        content.user_id = this.makeProjectinf.projectPeer.user_id[i]
+        content.user_name = this.makeProjectinf.projectPeer.user_name[i]
+
+        axios.post('/api/project_user', { content }).then((res) => {})
+      }
+
+      axios
+        .post('/api/makeProject/project_user/personal', { content })
+        .then((res) => {})
     },
 
     saveCheck() {
@@ -218,31 +257,21 @@ export default {
       } else {
         if (confirm('제출하시겠습니까?')) {
           this.randomNumber()
-          this.onSave()
-          this.getImage()
+          this.uploadImage()
+          this.uploadFile()
+
+          var _this = this
+
           setTimeout(function () {
-            alert('시작할 겁니다.')
-            alert('wpqkf bb' + this.makeProjectinf.makeProject.name)
-            // const content = this.makeProjectinf.makeProject
-            // alert('wpqkf bb' + this.makeProjectinf.makeProject.image_path)
-            // alert(content.image_path)
-            // axios.post('/api/addproject', { content }).then((res) => {})
-
-            // // 함꼐하는 사용자의 아이디와 이름 content로 추가
-            // for (const i in this.makeProjectinf.projectPeer.user_id) {
-            //   content.user_id = this.makeProjectinf.projectPeer.user_id[i]
-            //   content.user_name = this.makeProjectinf.projectPeer.user_name[i]
-
-            //   axios.post('/api/project_user', { content }).then((res) => {})
-            // }
-
-            // axios
-            //   .post('/api/makeProject/project_user/personal', { content })
-            //   .then((res) => {})
-
-            // this.$router.push('/project')
-            alert('끝났나요 ㅠ?')
+            _this.getImage()
+            _this.getFile()
           }, 500)
+
+          setTimeout(function () {
+            _this.makeProject()
+          }, 1500)
+
+          this.$router.push('/project')
         }
       }
     },

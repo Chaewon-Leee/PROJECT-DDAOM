@@ -10,7 +10,6 @@
           </label>
         </div>
       </div>
-      <img class="mainphoto" :src="proimg.img" />
       <ul :key="i" v-for="(project, i) in projectstatus.status" id="ulborder">
         <li class="projectname" style="margin-top: 20px">
           <div>
@@ -74,25 +73,39 @@
                 style="resize: none; width: 47vw"
                 rows="5"
               ></textarea>
-              <p>관련 링크 :</p>
-              <span
-                :key="j"
-                v-for="(link, j) in linklist.Link"
-                class="linkSpan"
-              >
-                <a :href="link.url" v-if="project.id === link.project_id">{{
-                  link.title
-                }}</a>
-                <div
-                  :class="project.name"
-                  style="display: none"
-                  v-if="project.id === link.project_id"
+              <div>
+                <span>링크 : </span>
+                <span
+                  :key="j"
+                  v-for="(link, j) in linklist.Link"
+                  class="linkSpan"
                 >
-                  <input type="text" :value="link.title" style="width: 50vw" />
-                  <input type="text" :value="link.url" style="width: 50vw" />
-                </div>
-              </span>
-
+                  <a :href="link.url" v-if="project.id === link.project_id">{{
+                    link.title
+                  }}</a>
+                  <div
+                    :class="project.name"
+                    style="display: none"
+                    v-if="project.id === link.project_id"
+                  >
+                    <input
+                      type="text"
+                      :value="link.title"
+                      style="width: 50vw"
+                    />
+                    <input type="text" :value="link.url" style="width: 50vw" />
+                  </div>
+                </span>
+              </div>
+              <div>
+                <span>파일 : </span>
+                <a
+                  v-if="project.file_path !== null || project.file_path !== ''"
+                  :href="project.file_path"
+                  download="file"
+                  >파일</a
+                >
+              </div>
               <div :key="i" v-for="(schedule, i) in proschedule.schedule">
                 <div
                   v-if="project.id === schedule.project_id"
@@ -147,11 +160,6 @@ export default {
       logininf.loginaccount = res.data
     })
 
-    axios.get('/api/sendimg').then((res) => {
-      console.log(res.data)
-      proimg.img = res.data
-    })
-
     const project = reactive({
       projectList: []
     })
@@ -170,10 +178,6 @@ export default {
 
     const proschedule = reactive({
       schedule: []
-    })
-
-    const proimg = reactive({
-      img: []
     })
 
     axios.get('/api/link').then((res) => {
@@ -224,8 +228,7 @@ export default {
       peerlist,
       projectstatus,
       toggle,
-      proschedule,
-      proimg
+      proschedule
     }
   },
   methods: {
