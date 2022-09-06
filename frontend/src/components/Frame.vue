@@ -107,7 +107,7 @@ export default {
       state.Project_User = res.data
     })
 
-    axios.post('/api/frame/project_name').then((res) => {
+    axios.post('/api/frame/project').then((res) => {
       // 프로젝트 이름
       state.Project = res.data
     })

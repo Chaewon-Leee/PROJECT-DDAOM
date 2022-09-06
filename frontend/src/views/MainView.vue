@@ -278,6 +278,7 @@ export default {
 
       if (checkValue[1] === true) {
         const check = eventsId.some((item) => item === schedule.id)
+
         if (check === false) {
           const first = new Date(schedule.start_date)
           const second = new Date(schedule.end_date)
