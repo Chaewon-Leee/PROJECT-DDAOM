@@ -271,7 +271,7 @@ export default {
             _this.makeProject()
           }, 1500)
 
-          this.$router.push('/project')
+          this.$router.push('/main')
         }
       }
     },
