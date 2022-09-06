@@ -335,7 +335,7 @@ app.put("/api/fixlink/:linkid", async (req, res) => {
 app.get("/api/schedule", async (req, res) => {
   // 프로젝트 일정 가져오기
   const result = await database.run(
-    `SELECT * FROM Schedule WHERE user_id = '${a}'`
+    `SELECT * FROM Schedule`
   );
   res.send(result);
 });
@@ -367,7 +367,7 @@ app.post("/api/main/Project", async (req, res) => {
 
 app.post("/api/main/Schedule", async (req, res) => {
   const Schedule = await database.run(
-    `SELECT * FROM Schedule WHERE user_id = '${a}';`
+    `SELECT * FROM Schedule;`
   );
   res.send(Schedule);
 });
