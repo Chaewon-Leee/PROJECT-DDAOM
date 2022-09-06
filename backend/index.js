@@ -19,15 +19,15 @@ app.use("/files", express.static("files"));
 
 app.post("/api/frame/color", async (req, res) => {
   const Project_User = await database.run(
-    `SELECT * FROM Project_User WHERE user_id = "${a}"`
+    `SELECT * FROM Project_User WHERE user_id = "${a}" ORDER BY project_id`
   );
   res.send(Project_User);
 });
 
-app.post("/api/frame/project_name", async (req, res) => {
+app.post("/api/frame/project", async (req, res) => {
   const Project = await database.run(
     `SELECT * FROM Project WHERE id IN
-    (SELECT project_id FROM Project_User WHERE user_id ='${a}');`
+    (SELECT project_id FROM Project_User WHERE user_id ='${a}' ORDER BY project_id);`
   );
   res.send(Project);
 });
@@ -367,7 +367,7 @@ app.post("/api/main/Project", async (req, res) => {
 
 app.post("/api/main/Schedule", async (req, res) => {
   const Schedule = await database.run(
-    `SELECT * FROM Schedule;`
+    `SELECT * FROM Schedule ORDER BY project_id;`
   );
   res.send(Schedule);
 });
